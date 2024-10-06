@@ -1,7 +1,7 @@
-import React from "react";
+
 import 'cropperjs/dist/cropper.css';
 import { Cropper } from "react-cropper";
-import { set } from "date-fns";
+
 
 interface Props {
     imagePreview: string;

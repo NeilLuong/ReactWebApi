@@ -1,16 +1,19 @@
 import { makeAutoObservable, reaction, runInAction } from "mobx";
-import { Photo, Profile } from "../models/profile";
+import { Photo, Profile, UserActivity } from "../models/profile";
 import agent from "../api/agent";
 import { store } from "./store";
 
-export default class ProfileStore{
+export default class ProfileStore {
+    currentUserProfile: Profile | null = null;
     profile: Profile | null = null;
     loadingProfile = false;
     uploading = false;
     loading = false;
-    followings: Profile[] =[];
-    loadingFollowings: boolean = false;
-    activeTab = 0;
+    followings: Profile[] = [];
+    loadingFollowings = false;
+    activeTab: number = 0;
+    userActivities: UserActivity[] = [];
+    loadingActivities = false;
 
     constructor() {
         makeAutoObservable(this);
@@ -61,7 +64,7 @@ export default class ProfileStore{
             const response = await agent.Profiles.uploadPhoto(file);
             const photo = response.data;
             runInAction(() => {
-                if (this.profile ) {
+                if (this.profile) {
                     this.profile.photos?.push(photo);
                     if (photo.isMain && store.userStore.user) {
                         store.userStore.setImage(photo.url);
@@ -115,20 +118,20 @@ export default class ProfileStore{
     updateProfile = async (profile: Partial<Profile>) => {
         this.loading = true;
         try {
-        await agent.Profiles.updateProfile(profile);
-        runInAction(() => {
-        if (profile.displayName && profile.displayName !==
-       store.userStore.user?.displayName) {
-        store.userStore.setDisplayName(profile.displayName);
-        }
-        this.profile = {...this.profile, ...profile as Profile};
-        this.loading = false;
-        })
+            await agent.Profiles.updateProfile(profile);
+            runInAction(() => {
+                if (profile.displayName && profile.displayName !==
+                    store.userStore.user?.displayName) {
+                    store.userStore.setDisplayName(profile.displayName);
+                }
+                this.profile = { ...this.profile, ...profile as Profile };
+                this.loading = false;
+            })
         } catch (error) {
-        console.log(error);
-        runInAction(() => this.loading = false);
+            console.log(error);
+            runInAction(() => this.loading = false);
         }
-        }
+    }
 
     updateFollowing = async (username: string, following: boolean) => {
         this.loading = true;
@@ -168,6 +171,23 @@ export default class ProfileStore{
         } catch (error) {
             console.log(error);
             runInAction(() => this.loadingFollowings = false);
+        }
+    }
+
+    loadUserActivities = async (username: string, predicate?: string) => {
+        this.loadingActivities = true;
+        try {
+            const activities = await agent.Profiles.listActivities(username,
+                predicate!);
+            runInAction(() => {
+                this.userActivities = activities;
+                this.loadingActivities = false;
+            })
+        } catch (error) {
+            console.log(error);
+            runInAction(() => {
+                this.loadingActivities = false;
+            })
         }
     }
 }

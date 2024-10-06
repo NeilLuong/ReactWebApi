@@ -16,7 +16,7 @@ import MyDateInput from "../../../App/common/form/MyDateInput";
 
 export default observer(function ActivityForm() {
     const { activityStore } = useStore();
-    const { createActivity, updateActivity, loading, loadActivity, loadingInitial } = activityStore;
+    const { createActivity, updateActivity, loadActivity, loadingInitial } = activityStore;
     const { id } = useParams();
     const navigate = useNavigate();
 

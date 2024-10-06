@@ -7,7 +7,7 @@ import { useStore } from "../../App/stores/store";
 export default observer(function LoginForm() {
     const {userStore} = useStore();
     return (
-        <Formik initialValues={{email: "", password: "", error: null}} onSubmit={(values, {setErrors}) => userStore.login(values).catch(error =>
+        <Formik initialValues={{email: "", password: "", error: null}} onSubmit={(values, {setErrors}) => userStore.login(values).catch(() =>
          setErrors({error: "Invalid email or password"}))}
          >
             {({handleSubmit, isSubmitting, errors}) => (

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { Button, Grid, Header, Tab } from "semantic-ui-react";
 import { observer } from 'mobx-react-lite';
 import { useStore } from '../../App/stores/store';
